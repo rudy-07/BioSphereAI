@@ -1,0 +1,11 @@
+# Excluded files
+05_interview_and_internship_strategy.md
+
+# Python cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv
+env/
+venv/

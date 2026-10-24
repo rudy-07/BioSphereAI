@@ -1,0 +1,199 @@
+{
+  "recordType": "egv",
+  "recordVersion": "v3",
+  "userId": "usr_dexcom_demo_001",
+  "records": [
+    {
+      "systemTime": "2026-10-09T00:00:00",
+      "displayTime": "2026-10-09T00:00:00",
+      "value": 110,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.0
+    },
+    {
+      "systemTime": "2026-10-09T00:05:00",
+      "displayTime": "2026-10-09T00:05:00",
+      "value": 111,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.2
+    },
+    {
+      "systemTime": "2026-10-09T00:10:00",
+      "displayTime": "2026-10-09T00:10:00",
+      "value": 111,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.12
+    },
+    {
+      "systemTime": "2026-10-09T00:15:00",
+      "displayTime": "2026-10-09T00:15:00",
+      "value": 109,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.42
+    },
+    {
+      "systemTime": "2026-10-09T00:20:00",
+      "displayTime": "2026-10-09T00:20:00",
+      "value": 108,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.16
+    },
+    {
+      "systemTime": "2026-10-09T00:25:00",
+      "displayTime": "2026-10-09T00:25:00",
+      "value": 109,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.22
+    },
+    {
+      "systemTime": "2026-10-09T00:30:00",
+      "displayTime": "2026-10-09T00:30:00",
+      "value": 111,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.3
+    },
+    {
+      "systemTime": "2026-10-09T00:35:00",
+      "displayTime": "2026-10-09T00:35:00",
+      "value": 108,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.56
+    },
+    {
+      "systemTime": "2026-10-09T00:40:00",
+      "displayTime": "2026-10-09T00:40:00",
+      "value": 105,
+      "status": "inRange",
+      "trend": "singleDown",
+      "trendRate": -0.7
+    },
+    {
+      "systemTime": "2026-10-09T00:45:00",
+      "displayTime": "2026-10-09T00:45:00",
+      "value": 105,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.1
+    },
+    {
+      "systemTime": "2026-10-09T00:50:00",
+      "displayTime": "2026-10-09T00:50:00",
+      "value": 104,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.22
+    },
+    {
+      "systemTime": "2026-10-09T00:55:00",
+      "displayTime": "2026-10-09T00:55:00",
+      "value": 114,
+      "status": "inRange",
+      "trend": "singleUp",
+      "trendRate": 2.06
+    },
+    {
+      "systemTime": "2026-10-09T01:00:00",
+      "displayTime": "2026-10-09T01:00:00",
+      "value": 115,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.24
+    },
+    {
+      "systemTime": "2026-10-09T01:05:00",
+      "displayTime": "2026-10-09T01:05:00",
+      "value": 110,
+      "status": "inRange",
+      "trend": "singleDown",
+      "trendRate": -1.04
+    },
+    {
+      "systemTime": "2026-10-09T01:10:00",
+      "displayTime": "2026-10-09T01:10:00",
+      "value": 111,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.24
+    },
+    {
+      "systemTime": "2026-10-09T01:15:00",
+      "displayTime": "2026-10-09T01:15:00",
+      "value": 112,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.14
+    },
+    {
+      "systemTime": "2026-10-09T01:20:00",
+      "displayTime": "2026-10-09T01:20:00",
+      "value": 110,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.42
+    },
+    {
+      "systemTime": "2026-10-09T01:25:00",
+      "displayTime": "2026-10-09T01:25:00",
+      "value": 118,
+      "status": "inRange",
+      "trend": "singleUp",
+      "trendRate": 1.62
+    },
+    {
+      "systemTime": "2026-10-09T01:30:00",
+      "displayTime": "2026-10-09T01:30:00",
+      "value": 103,
+      "status": "inRange",
+      "trend": "singleDown",
+      "trendRate": -2.98
+    },
+    {
+      "systemTime": "2026-10-09T01:35:00",
+      "displayTime": "2026-10-09T01:35:00",
+      "value": 116,
+      "status": "inRange",
+      "trend": "singleUp",
+      "trendRate": 2.52
+    },
+    {
+      "systemTime": "2026-10-09T01:40:00",
+      "displayTime": "2026-10-09T01:40:00",
+      "value": 110,
+      "status": "inRange",
+      "trend": "singleDown",
+      "trendRate": -1.08
+    },
+    {
+      "systemTime": "2026-10-09T01:45:00",
+      "displayTime": "2026-10-09T01:45:00",
+      "value": 113,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": 0.44
+    },
+    {
+      "systemTime": "2026-10-09T01:50:00",
+      "displayTime": "2026-10-09T01:50:00",
+      "value": 112,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.04
+    },
+    {
+      "systemTime": "2026-10-09T01:55:00",
+      "displayTime": "2026-10-09T01:55:00",
+      "value": 110,
+      "status": "inRange",
+      "trend": "flat",
+      "trendRate": -0.46
+    }
+  ]
+}
