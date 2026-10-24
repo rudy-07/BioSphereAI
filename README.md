@@ -6,7 +6,7 @@ This repository is designed to give you an unfair advantage: moving beyond high-
 
 ---
 
-## 📂 Repository Structure & Document Index
+## Repository Structure & Document Index
 
 ```
 dexcom/
@@ -27,7 +27,7 @@ dexcom/
 
 ---
 
-## 🧭 Executive Summary of Core Findings
+## Executive Summary of Core Findings
 
 ### 1. Dexcom's Massive Strategic Shift: Type 2 Diabetes & Stelo
 Historically, Dexcom’s business was built around Type 1 Diabetes (intensive insulin users requiring emergency hypoglycemia alarms). In August 2024, Dexcom launched **Stelo**, the first FDA-cleared over-the-counter (OTC) glucose biosensor in the US:
@@ -44,7 +44,7 @@ Why did your professor mention blood pressure alongside Dexcom?
 
 ---
 
-## 🚀 How to Run the Simulation Platform
+## How to Run the Simulation Platform
 
 ### 1. Command-Line Benchmark
 Run the standalone simulation to generate 24 hours of synchronized telemetry for both T1D and T2D patients:
@@ -74,8 +74,3 @@ streamlit run app.py
 
 ---
 
-## 🎯 Next Steps for Your Internship Journey
-
-1. **Review File 05:** Read [05_interview_and_internship_strategy.md](file:///d:/Projects/Portfolio%20Websites/rudy/dexcom/05_interview_and_internship_strategy.md) to practice the pitch script for your professor and review the interview Q&A.
-2. **Review File 04:** Read [04_technical_paper_draft.md](file:///d:/Projects/Portfolio%20Websites/rudy/dexcom/04_technical_paper_draft.md) to understand the academic framing you can co-author with your professor.
-3. **Launch the Demo:** Run `python run_demo.py` and `streamlit run app.py` so you can demonstrate the live dashboard directly on your laptop or screen during meetings.
