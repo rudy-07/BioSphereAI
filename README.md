@@ -22,7 +22,10 @@ dexcom/
     ├── ai_modules.py                         # Multi-horizon forecasting, Clarke EGA, AID safety, Gemini nudges
     ├── run_demo.py                           # CLI benchmark runner (outputs CSV & mock Dexcom API JSON)
     ├── app.py                                # Interactive Streamlit & Plotly web dashboard
+    ├── dataset_pipeline.py                   # Runs the analytics & engine replay on the GlucoBench CSV
     └── output/                               # Generated simulation streams & mock API payloads
+        └── dataset/                          # Dataset pipeline results (not in git, created on run)
+Dataset/                                      # Local copy of the GlucoBench CSV (not in git - see below)
 ```
 
 ---
@@ -71,6 +74,52 @@ streamlit run app.py
   * Adjust carbohydrate sliders for breakfast, lunch, and dinner in real time.
   * Visualize synchronized continuous glucose and cuffless blood pressure curves.
   * Inspect live Clarke Error Grid metrics, AI forecasting, and simulated Gemini insights.
+
+### 3. Dataset Pipeline (GlucoBench CSV)
+Runs the project's analytics on an external CGM dataset and replays each patient's logged meals, insulin and exercise through the simulation engine.
+
+**Step 1 - Get the dataset.** The dataset is **not stored in this repository** (it is large and has its own license), so each person downloads it once:
+
+1. Download `archive.zip` from: **TODO: add download link**
+2. Create a `Dataset/` folder in the repository root (next to this README).
+3. Unzip it there. You should end up with exactly this path:
+   ```
+   Dexcom-Simulator/Dataset/GlucoBench_benchmark_dataset.csv
+   ```
+   ```bash
+   mkdir -p Dataset
+   unzip ~/Downloads/archive.zip -d Dataset/
+   ```
+4. Check it: the file is about 2.7 MB with 15,731 rows (10 patients, 1-9 Sep 2024) and a header starting with `user_id,timestamp,glucose,cgm_quality_flag,...`.
+
+`Dataset/` and `simulation/output/dataset/` are listed in `.gitignore`, so neither the data nor anything derived from it gets committed.
+
+**Step 2 - Run the pipeline.**
+```bash
+cd simulation
+python dataset_pipeline.py                 # all 10 patients
+python dataset_pipeline.py --user U003     # a single patient
+python dataset_pipeline.py --data /other/path/file.csv   # CSV stored elsewhere
+python dataset_pipeline.py --no-plot       # skip the PNG
+```
+It runs in a few seconds and prints four sections:
+1. **Load & clean** - drops readings flagged as bad quality and puts each patient on a regular 5-minute grid (gaps up to 45 min are interpolated).
+2. **CGM metrics** - TIR / TBR / TAR / %CV / GMI per patient, compared with the recorded HbA1c.
+3. **Forecasting** - the 30- and 60-minute forecaster with Clarke Error Grid zones, scored against a naive "glucose stays the same" baseline. Only real (not interpolated) readings are used as targets.
+4. **Engine replay** - builds a virtual patient from each profile (weight, insulin sensitivity), simulates every day with that patient's logged events, and compares simulated vs. recorded glucose, including the average rise 1 hour after a meal.
+
+Results are written to `simulation/output/dataset/`:
+
+| File | Contents |
+|---|---|
+| `patient_summary.csv` | One row per patient: profile, CGM metrics, forecast errors, replay errors |
+| `cleaned_5min_grid.csv` | Cleaned glucose and events on the 5-minute grid |
+| `replay_recorded_vs_simulated.csv` | Recorded and simulated glucose side by side |
+| `replay_overview.png` | One day per patient: recorded vs. simulated glucose, with meals marked |
+
+**Important - this dataset appears to be synthetic.** Its columns are not physiologically linked: glucose does not rise after meals (average change 1 h after a meal is 0 mg/dL), insulin and exercise have no effect, sleep stages are random at every hour, and glucose never leaves 70-200 mg/dL. Use it to practise the data pipeline and to set up realistic patient parameters, **not** to train or validate meal, insulin or forecasting models, or to report forecast accuracy. For real clinical CGM data see OhioT1DM (requires a data-use agreement) or the source datasets of the GlucoBench benchmark (Sergazinov et al., 2023).
+
+**Modelling assumptions in the replay:** the engine's insulin sensitivity `p3` is scaled by the patient's `insulin_sensitivity / 45`; glucose and insulin distribution volumes scale with body weight (1.7 dL/kg and 50 mL/kg); exercise duration is estimated as steps / 100 per minute; the engine's basal insulin stays at its fixed 12 U/day.
 
 ---
 
