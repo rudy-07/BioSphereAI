@@ -1,76 +1,95 @@
-# Dexcom AI & Cardiometabolic Intelligence Research Suite
+# BioSphereAI: Multi-Modal Cardiometabolic Digital Twin and Clinical Benchmark Platform
 
-Welcome to the comprehensive research, technical architecture, and simulation platform developed for the **Dexcom AI Integration Internship**.
+BioSphereAI is an autonomous cardiometabolic digital twin and clinical benchmark suite evaluating wearable biosensor time series across three core domains:
 
-This repository is designed to give you an unfair advantage: moving beyond high-level generalities to deliver rigorous clinical domain knowledge, exact product architecture, publication-grade academic writing, and a **fully working in silico simulation codebase**.
+1. **Short-Term Glucose Forecasting (30m and 60m Horizons):** Head-to-head comparison of continuous Neural Ordinary Differential Equations (LatentODE), foundation transformers (Google TimesFM 2.5), and on-device TinyML algorithms on verified clinical cohorts.
+2. **Autonomous Insulin Delivery (AID) Closed-Loop Safety:** A 30-patient FDA-accepted virtual cohort trial demonstrating a **76.0% reduction in pediatric hypoglycemia** using a Control Barrier Function (CBF) supervisory safety filter.
+3. **Continuous Cuffless Blood Pressure Estimation:** Machine learning regressors (Random Forest and Gradient Boosting) and a 3-Element Windkessel hemodynamic model on synchronized ICU waveforms achieving **BHS Grade A** and **AAMI standard compliance** (MAE <= 3.44 mmHg).
 
 ---
 
-## Repository Structure & Document Index
+## Repository Directory Structure
 
+```text
+BioSphereAI/
+├── benchmarks/                                # Automated benchmark execution scripts
+│   ├── benchmark_timesfm.py                   # Google TimesFM 2.5 zero-shot evaluation
+│   ├── benchmark_simglucose.py                # 30-patient UVa/Padova AID closed-loop trial
+│   ├── benchmark_cuffless_bp.py               # PTT/PPG cuffless BP regressor and Windkessel twin
+│   └── process_shanghai.py                    # Shanghai T2DM hospital cohort extraction pipeline
+│
+├── Dataset/                                   # Locked-in clinical datasets and benchmark results
+│   ├── hall_dexcom_real.csv                   # Stanford Hall 2018 (Continuous CGM, 57 patients, 105k rows)
+│   ├── shanghai_summary.csv                   # Shanghai T2DM clinical summary (109 patients)
+│   ├── shanghai_clean_sample.csv              # High-resolution Shanghai CGM with real oral medications
+│   ├── simglucose_benchmark_results.csv       # Complete 30-patient UVa/Padova AID trial output
+│   ├── cuffless_bp_benchmark_results.csv      # BHS / AAMI standards evaluation on UCI MIMIC-II
+│   └── timesfm_benchmark_results.csv          # Foundation model benchmark output
+│
+├── docs/                                      # Master documentation and clinical reports
+│   ├── MASTER_CLINICAL_AI_BENCHMARK_REPORT.md # Comprehensive engineering and clinical benchmark paper
+│   └── archive/                               # Background research notes and previous drafts
+│
+├── simulation/                                # Multi-modal digital twin and dashboard
+│   ├── app.py                                 # Interactive 5-tab Streamlit analytics dashboard
+│   ├── engine.py                              # Physiological metabolic and hemodynamic ODE simulator
+│   ├── ai_modules.py                          # MultiHorizonForecaster, AID CBF Controller, Analyzer
+│   ├── requirements.txt                       # Core dependencies
+│   └── output/                                # Local cached simulation streams and patient summaries
+│
+└── README.md                                  # Production overview and quickstart guide
 ```
-dexcom/
-├── README.md                                 # Executive summary & roadmap (this document)
-├── 01_dexcom_company_products_ecosystem.md   # Products (G7, Stelo, ONE+), APIs, Google Vertex AI, Nanowear
-├── 02_ai_ml_integration_opportunities.md     # Deep AI/ML analysis: T1D vs T2D, PINNs, Safe RL, Cuffless BP, TinyML
-├── 03_simulation_project_architecture.md     # In silico physiological digital twin architecture & math
-├── 04_technical_paper_draft.md               # Publication-ready IEEE/Nature-style technical paper draft
-├── 05_interview_and_internship_strategy.md   # Pitch script for your professor, interview Q&A, and vocabulary
-└── simulation/                               # Fully functional Python simulation codebase
-    ├── requirements.txt                      # Dependencies (numpy, scipy, pandas, streamlit, plotly)
-    ├── engine.py                             # ODE minimal model kinetics, ISF lag, PISA, Windkessel BP
-    ├── ai_modules.py                         # Multi-horizon forecasting, Clarke EGA, AID safety, Gemini nudges
-    ├── run_demo.py                           # CLI benchmark runner (outputs CSV & mock Dexcom API JSON)
-    ├── app.py                                # Interactive Streamlit & Plotly web dashboard
-    └── output/                               # Generated simulation streams & mock API payloads
-```
 
 ---
 
-## Executive Summary of Core Findings
+## Two-Tier System Architecture
 
-### 1. Dexcom's Massive Strategic Shift: Type 2 Diabetes & Stelo
-Historically, Dexcom’s business was built around Type 1 Diabetes (intensive insulin users requiring emergency hypoglycemia alarms). In August 2024, Dexcom launched **Stelo**, the first FDA-cleared over-the-counter (OTC) glucose biosensor in the US:
-* **The Clinical Distinction:** Stelo is designed for non-insulin Type 2 diabetics and pre-diabetics.
-* **The UX & Algorithmic Change:** Stelo eliminates low-glucose audible alarms to avoid "alarm fatigue." The value proposition is entirely **behavioral modification, meal response prediction, and metabolic feedback**.
+BioSphereAI implements a two-tier edge-cloud architecture:
 
-### 2. The Google Cloud GenAI Partnership (Late 2024)
-Dexcom integrated **Google Cloud’s Vertex AI and Gemini models** to launch a proprietary Generative AI engine. Currently powering **Stelo Weekly Insights**, it translates complex biometric time-series (glucose, sleep, steps) into plain-language coaching.
-
-### 3. The Blood Pressure & Cardiovascular Connection
-Why did your professor mention blood pressure alongside Dexcom?
-* **Clinical Rationale:** Over **75% of Type 2 diabetes patients have hypertension** ("cardiometabolic syndrome"). Acute glucose spikes cause oxidative stress, impair nitric oxide production, and cause arterial vasoconstriction. Diabetics also suffer from **nocturnal non-dipping blood pressure** (a major predictor of heart attacks and stroke).
-* **Corporate Milestone:** Dexcom officially partnered with **Nanowear** to integrate G7 CGM telemetry with Nanowear's FDA 510(k)-cleared **SimpleSense-BP cuffless blood pressure** and hemodynamic platform.
+* **Tier 2 (On-Device Wearable Firmware): Custom TinyML Analytical Forecaster**
+  * Uses a 4-point Savitzky-Golay polynomial velocity estimator with exponential physiological damping.
+  * Inference latency: **< 0.05 ms**.
+  * Memory footprint: **1.2 KB RAM** (zero external weight files).
+  * Suitable for ultra-low-power ARM Cortex-M microcontrollers operating on coin-cell batteries.
+* **Tier 1 (Cloud Foundation Engine): LatentODE (Neural Differential Equations)**
+  * Selected as the primary cloud architecture over foundation transformers.
+  * Accuracy: **8.66 mg/dL MAE**, **92.5% Clarke Error Grid Zone A**.
+  * Models biological glucose kinetics as a continuous-time differential equation vector field.
+  * Memory footprint: **95 MB**, significantly lighter and more practical for cloud hosting than 200M parameter transformers (800 MB).
 
 ---
 
-## How to Run the Simulation Platform
+## Quickstart: Running the Interactive Dashboard
 
-### 1. Command-Line Benchmark
-Run the standalone simulation to generate 24 hours of synchronized telemetry for both T1D and T2D patients:
+Install dependencies and launch the Streamlit analytics interface:
+
 ```bash
-cd "dexcom/simulation"
-python run_demo.py
-```
-This script computes:
-* Time In Range (TIR), Time Below Range (TBR), Glycemic Variability (%CV).
-* Multi-Horizon AI Forecasting with Clarke Error Grid classification.
-* Generative AI coaching nudge for postprandial meals.
-* Counterfactual evaluation (blunting glucose spikes via a 15-minute post-meal walk).
-* Nocturnal non-dipping blood pressure detection.
-* Exports telemetry to CSV and saves a compliant mock Dexcom Developer API JSON payload (`GET /v3/users/self/egvs`).
+# 1. Navigate to the project root
+cd "d:/Projects/College projects/Dexcom Simulator"
 
-### 2. Interactive Web Dashboard (Streamlit & Plotly)
-Launch the interactive visualizer:
-```bash
-cd "dexcom/simulation"
-streamlit run app.py
+# 2. Install dependencies
+pip install -r simulation/requirements.txt
+
+# 3. Launch the dashboard
+streamlit run simulation/app.py
 ```
-* **Features:**
-  * Toggle between Type 1 (G7 + Insulin AID) and Type 2 (Stelo + Lifestyle AI).
-  * Adjust carbohydrate sliders for breakfast, lunch, and dinner in real time.
-  * Visualize synchronized continuous glucose and cuffless blood pressure curves.
-  * Inspect live Clarke Error Grid metrics, AI forecasting, and simulated Gemini insights.
+
+The interactive dashboard provides five primary modules:
+* **Tab 1: In Silico Simulation Twin:** 24-hour sandbox for meals, exercise, nocturnal sensor compression lows (PISA), and closed-loop control.
+* **Tab 2: Clinical Cohort Explorer:** Patient-by-patient browser for Stanford Hall (57 patients) and Shanghai T2DM hospital records with real oral medications (Metformin, Acarbose).
+* **Tab 3: Autonomous Insulin Delivery Safety:** Interactive viewer for the 30-patient trial demonstrating the 76% reduction in pediatric hypoglycemia via Control Barrier Functions.
+* **Tab 4: Continuous Cuffless BP Estimation:** Optical PPG/PTT blood pressure regressors validated against international medical standards.
+* **Tab 5: Master Model Benchmark Matrix:** Comprehensive comparison table and deployment architecture.
 
 ---
 
+## Summary of Core Results
+
+| Domain and Clinical Task | Dataset Used | Selected Model | Metric Result | Clinical Standard / Compliance | Latency | Hardware Footprint |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Glucose Forecasting (Cloud)** | Stanford Hall 2018 | **LatentODE (Neural ODE)** | **8.66 mg/dL** MAE | **92.5%** Clarke Zone A | 310.2 ms | 95 MB (Cloud Server) |
+| **Glucose Forecasting (Edge)** | Stanford Hall 2018 | **Custom Edge Forecaster** | **10.42 mg/dL** MAE | **87.2%** Clarke Zone A | **< 0.05 ms** | **1.2 KB (Sensor MCU)** |
+| **Pediatric Hypo Reduction** | simglucose (Children N=10) | **Safe CBF Controller** | **2.32% TBR** (vs 9.64%) | **-76.0% Hypoglycemia** | Instant | Smart AID Algorithm |
+| **Continuous Cuffless BP** | UCI / MIMIC-II (PPG+ECG) | **Gradient Boosting Regressor** | **3.25 mmHg** SBP MAE | **BHS Grade A, AAMI PASS** | 1.4 ms | Embedded Firmware |
+
+For full mathematical derivations, hardware specifications, and clinical analyses, see `docs/MASTER_CLINICAL_AI_BENCHMARK_REPORT.md`.

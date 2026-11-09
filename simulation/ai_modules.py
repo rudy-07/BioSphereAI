@@ -38,16 +38,21 @@ class MultiHorizonForecaster:
         min_hist = 6
         for i in range(min_hist, n_samples - steps_ahead):
             current_g = cgm_history[i]
-            # Velocity over last 15 minutes (3 samples)
-            dg_dt = (cgm_history[i] - cgm_history[i - 3]) / 15.0
-
-            # Physiological horizon prediction with momentum damping
-            # Glucose cannot accelerate indefinitely without active meal/insulin
-            decay = np.exp(-horizon_min / 35.0)
-            pred = current_g + (dg_dt * horizon_min * decay)
             
-            # Regression towards mean baseline for long horizons
-            pred = 0.85 * pred + 0.15 * 115.0
+            # Savitzky-Golay 4-point linear regression velocity (mg/dL per minute)
+            # Sample points at t = -15, -10, -5, 0 minutes
+            dg_dt = (3.0 * current_g + cgm_history[i - 1] - cgm_history[i - 2] - 3.0 * cgm_history[i - 3]) / 50.0
+
+            # Physiological momentum extrapolation with saturation damping
+            decay = np.exp(-horizon_min / 30.0)
+            delta = dg_dt * horizon_min * decay
+            
+            # Adaptive soft regression towards patient's local moving median baseline
+            # (Eliminates the artificial hardcoded 115 mg/dL bias)
+            local_baseline = float(np.median(cgm_history[max(0, i - 6):i + 1]))
+            alpha_reg = min(0.10, horizon_min / 300.0)
+            
+            pred = (1.0 - alpha_reg) * (current_g + delta) + alpha_reg * local_baseline
             pred = max(40.0, min(400.0, pred))
 
             preds.append(pred)

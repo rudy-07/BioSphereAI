@@ -1,0 +1,5 @@
+Model,SBP_MAE,SBP_SD,SBP_Corr,SBP_BHS,SBP_AAMI,DBP_MAE,DBP_SD,DBP_Corr,DBP_BHS,DBP_AAMI
+Random Forest (Cuff_less_BP),3.44,4.19,0.937,A,PASS,3.18,4.0,0.863,A,PASS
+Gradient Boosting (XGB),3.25,4.0,0.942,A,PASS,3.19,3.91,0.869,A,PASS
+Coupled Windkessel Twin,31.7,8.26,0.76,D,FAIL,20.62,6.07,0.827,D,FAIL
+Population Baseline,9.86,11.93,,D,FAIL,6.47,7.9,,C,FAIL
