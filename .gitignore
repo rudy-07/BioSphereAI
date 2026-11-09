@@ -10,3 +10,6 @@ __pycache__/
 env/
 venv/
 Dataset/
+
+# Outputs derived from the local Dataset/ (not redistributable)
+simulation/output/dataset/
