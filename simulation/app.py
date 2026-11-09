@@ -200,7 +200,10 @@ fig.update_xaxes(title_text="Time of Day (Hours from 00:00 Midnight)", row=2, co
 fig.update_yaxes(title_text="Glucose (mg/dL)", row=1, col=1, range=[40, 320])
 fig.update_yaxes(title_text="Pressure (mmHg)", row=2, col=1, range=[50, 180])
 
-st.plotly_chart(fig, use_container_width=True)
+try:
+    st.plotly_chart(fig, width="stretch")
+except TypeError:
+    st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
 # AI CLINICAL REASONING & GENERATIVE AI SECTION

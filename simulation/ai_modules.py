@@ -243,8 +243,9 @@ class CardiometabolicAnalyzer:
         g_window = cgm_data[meal_start_idx:end_idx]
         sbp_window = sbp_data[meal_start_idx:end_idx]
 
-        delta_g = np.trapz(np.maximum(0.0, g_window - g_window[0]))
-        delta_sbp = np.trapz(np.maximum(0.0, sbp_window - sbp_window[0]))
+        _trapezoid = getattr(np, "trapezoid", getattr(np, "trapz", None))
+        delta_g = _trapezoid(np.maximum(0.0, g_window - g_window[0]))
+        delta_sbp = _trapezoid(np.maximum(0.0, sbp_window - sbp_window[0]))
 
         if delta_g < 1e-3:
             return 0.0
