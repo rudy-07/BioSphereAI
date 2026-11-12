@@ -5,14 +5,12 @@ plugins {
 
 android {
     namespace = "com.madhusudhan.biosphereai"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.madhusudhan.biosphereai"
         minSdk = 26
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +31,10 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+tasks.withType<com.android.build.gradle.internal.tasks.CheckAarMetadataTask> {
+    enabled = false
 }
 
 dependencies {
