@@ -25,6 +25,8 @@ data class PatientProfile(
     val tauIsf: Double,
     val tauGut: Double,
     val bioavail: Double,
+    /** Resting heart rate, bpm (drives the simulated heart rate used for the BP estimate). */
+    val restingHr: Double = 70.0,
 ) {
     companion object {
         fun type1() = PatientProfile(
@@ -46,7 +48,15 @@ sealed interface CareEvent {
     val minute: Int
 }
 
-data class MealEvent(override val minute: Int, val carbs: Double, val label: String) : CareEvent
+/** Macronutrients from a meal analysis, when one was done. */
+data class Macros(val proteinG: Double, val fatG: Double, val fiberG: Double, val glycemicLoad: String)
+
+data class MealEvent(
+    override val minute: Int,
+    val carbs: Double,
+    val label: String,
+    val macros: Macros? = null,
+) : CareEvent
 
 data class InsulinEvent(
     override val minute: Int,
@@ -59,6 +69,7 @@ data class ExerciseEvent(
     val durationMin: Double,
     /** 0.7 light, 1.0 moderate, 1.5 vigorous (same scale as engine.py). */
     val intensity: Double,
+    val activity: String = "Activity",
 ) : CareEvent
 
 /**
@@ -68,6 +79,7 @@ data class ExerciseEvent(
  */
 class VirtualPatient(val profile: PatientProfile, seed: Long) {
     private val rng = Random(seed)
+    private val hrRng = Random(seed xor 0x5EED)   // separate stream so glucose noise is unchanged
 
     var minute = 0
         private set
@@ -77,6 +89,10 @@ class VirtualPatient(val profile: PatientProfile, seed: Long) {
         private set
     private var insulinAction = 0.0
     private var plasmaInsulin = profile.i0
+
+    /** Simulated heart rate, bpm (relaxes toward a target set by activity and glucose). */
+    var heartRate = profile.restingHr
+        private set
 
     /** Scales the pump's basal rate (set by the safety filter). */
     var basalFraction = 1.0
@@ -98,10 +114,24 @@ class VirtualPatient(val profile: PatientProfile, seed: Long) {
         insulinAction = max(0.0, insulinAction + dX)
         plasmaInsulin = max(0.0, plasmaInsulin + dI)
         interstitialGlucose = max(35.0, interstitialGlucose + (bloodGlucose - interstitialGlucose) / p.tauIsf)
+        updateHeartRate(t, events)
         minute++
 
         val noise = rng.nextGaussian() * SENSOR_NOISE_SD
         return (interstitialGlucose * (1.0 + noise) * 10.0).roundToInt() / 10.0
+    }
+
+    private fun updateHeartRate(t: Double, events: List<CareEvent>) {
+        var target = profile.restingHr
+        for (e in events) {
+            if (e !is ExerciseEvent) continue
+            val end = e.minute + e.durationMin
+            if (t >= e.minute && t <= end) target += 45.0 * e.intensity
+            else if (t > end && t <= end + 60.0) target += 15.0 * e.intensity * exp(-(t - end) / 15.0)
+        }
+        if (bloodGlucose < 70.0) target += (70.0 - bloodGlucose) * 0.5      // sympathetic response to a low
+        if (bloodGlucose > 180.0) target += (bloodGlucose - 180.0) * 0.03
+        heartRate += (target - heartRate) / 3.0 + hrRng.nextGaussian() * 0.6
     }
 
     private fun gutAbsorption(t: Double, events: List<CareEvent>): Double {

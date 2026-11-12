@@ -8,15 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
+enum class ThemeMode(val label: String) { SYSTEM("System"), LIGHT("Light"), DARK("Dark") }
+
 private val LightColors = lightColorScheme(
-    primary = Indigo,
+    primary = Green,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFDDE1FF),
-    onPrimaryContainer = IndigoDeep,
-    secondary = Cyan,
+    primaryContainer = Color(0xFFDCEFD9),
+    onPrimaryContainer = GreenDeep,
+    secondary = LightInkSecondary,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFCDEFF4),
-    onSecondaryContainer = Color(0xFF053E47),
+    secondaryContainer = LightSurfaceVariant,
+    onSecondaryContainer = LightInk,
     background = LightBackground,
     onBackground = LightInk,
     surface = LightSurface,
@@ -24,44 +26,61 @@ private val LightColors = lightColorScheme(
     surfaceVariant = LightSurfaceVariant,
     onSurfaceVariant = LightInkSecondary,
     surfaceContainer = LightSurface,
+    surfaceContainerLow = LightSurface,
     surfaceContainerHigh = LightSurfaceVariant,
+    surfaceContainerHighest = LightSurfaceVariant,
     outline = LightInkSecondary,
     outlineVariant = LightOutline,
-    error = Color(0xFFD63B3B),
+    error = Color(0xFFD93025),
 )
 
-private val DarkColors = darkColorScheme(
-    primary = IndigoSoft,
-    onPrimary = Color(0xFF0B1150),
-    primaryContainer = Color(0xFF2E3A8C),
-    onPrimaryContainer = Color(0xFFDDE1FF),
-    secondary = CyanSoft,
-    onSecondary = Color(0xFF00363E),
-    secondaryContainer = Color(0xFF0B4C57),
-    onSecondaryContainer = Color(0xFFCDEFF4),
-    background = DarkBackground,
+private fun darkColors(background: Color, surface: Color, surfaceVariant: Color) = darkColorScheme(
+    primary = GreenSoft,
+    onPrimary = Color(0xFF0B2E0D),
+    primaryContainer = Color(0xFF1F3A21),
+    onPrimaryContainer = Color(0xFFCDEBCB),
+    secondary = DarkInkSecondary,
+    onSecondary = background,
+    secondaryContainer = surfaceVariant,
+    onSecondaryContainer = DarkInk,
+    background = background,
     onBackground = DarkInk,
-    surface = DarkSurface,
+    surface = surface,
     onSurface = DarkInk,
-    surfaceVariant = DarkSurfaceVariant,
+    surfaceVariant = surfaceVariant,
     onSurfaceVariant = DarkInkSecondary,
-    surfaceContainer = DarkSurface,
-    surfaceContainerHigh = DarkSurfaceVariant,
+    surfaceContainer = surface,
+    surfaceContainerLow = surface,
+    surfaceContainerHigh = surfaceVariant,
+    surfaceContainerHighest = surfaceVariant,
     outline = DarkInkSecondary,
     outlineVariant = DarkOutline,
-    error = Color(0xFFFF6B6B),
+    error = Color(0xFFFF6B5E),
 )
+
+private val GraphiteColors = darkColors(GraphiteBackground, GraphiteSurface, GraphiteSurfaceVariant)
+private val AmoledColors = darkColors(AmoledBackground, AmoledSurface, AmoledSurfaceVariant)
+
+@Composable
+fun isDarkTheme(mode: ThemeMode): Boolean = when (mode) {
+    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    ThemeMode.LIGHT -> false
+    ThemeMode.DARK -> true
+}
 
 @Composable
 fun BioSphereAITheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    mode: ThemeMode = ThemeMode.SYSTEM,
+    pureBlack: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(LocalBioColors provides if (darkTheme) DarkBioColors else LightBioColors) {
-        MaterialTheme(
-            colorScheme = if (darkTheme) DarkColors else LightColors,
-            typography = Typography,
-            content = content,
-        )
+    val dark = isDarkTheme(mode)
+    val scheme = when {
+        !dark -> LightColors
+        pureBlack -> AmoledColors
+        else -> GraphiteColors
+    }
+    CompositionLocalProvider(LocalBioColors provides if (dark) DarkBioColors else LightBioColors) {
+        MaterialTheme(colorScheme = scheme, typography = Typography, content = content)
     }
 }

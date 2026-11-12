@@ -4,27 +4,31 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-// Brand
-val Indigo = Color(0xFF3D4FD6)
-val IndigoDeep = Color(0xFF2A389E)
-val IndigoSoft = Color(0xFF8E9BFF)
-val Cyan = Color(0xFF0E8FA3)
-val CyanSoft = Color(0xFF52CBDB)
+// Accent: one clinical green, used for "in range" and primary actions.
+val Green = Color(0xFF2F7D32)
+val GreenDeep = Color(0xFF1B5E20)
+val GreenSoft = Color(0xFF7BC67E)
 
-// Surfaces
-val LightBackground = Color(0xFFF4F5FA)
+// Light: soft grey page, white cards.
+val LightBackground = Color(0xFFF2F3F5)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFE8EAF4)
-val LightInk = Color(0xFF12152B)
-val LightInkSecondary = Color(0xFF555A75)
-val LightOutline = Color(0xFFD3D6E4)
+val LightSurfaceVariant = Color(0xFFEBEDEF)
+val LightInk = Color(0xFF16181A)
+val LightInkSecondary = Color(0xFF5F6368)
+val LightOutline = Color(0xFFDADCE0)
 
-val DarkBackground = Color(0xFF0D1020)
-val DarkSurface = Color(0xFF171B2E)
-val DarkSurfaceVariant = Color(0xFF22273E)
-val DarkInk = Color(0xFFEDEEF6)
-val DarkInkSecondary = Color(0xFFB2B6CC)
-val DarkOutline = Color(0xFF353B57)
+// Dark: graphite (brushed-metal greys, no blue tint).
+val GraphiteBackground = Color(0xFF121314)
+val GraphiteSurface = Color(0xFF1C1D1F)
+val GraphiteSurfaceVariant = Color(0xFF26282B)
+val DarkInk = Color(0xFFECEDEE)
+val DarkInkSecondary = Color(0xFFA9ACB0)
+val DarkOutline = Color(0xFF34373B)
+
+// Dark: pure black for AMOLED screens.
+val AmoledBackground = Color(0xFF000000)
+val AmoledSurface = Color(0xFF0E0F10)
+val AmoledSurfaceVariant = Color(0xFF1A1B1D)
 
 /** Colours with a fixed meaning in a CGM app (glucose status, chart marks). */
 @Immutable
@@ -34,6 +38,7 @@ data class BioColors(
     val urgentLow: Color,
     val high: Color,
     val forecast: Color,
+    val cloudForecast: Color,
     val targetBand: Color,
     val futureShade: Color,
     val meal: Color,
@@ -42,29 +47,31 @@ data class BioColors(
 )
 
 val LightBioColors = BioColors(
-    inRange = Indigo,
-    low = Color(0xFFD63B3B),
-    urgentLow = Color(0xFFA31A1A),
-    high = Color(0xFFD98A00),
-    forecast = Cyan,
-    targetBand = Color(0x1F3D4FD6),
-    futureShade = Color(0x0D12152B),
-    meal = Color(0xFFD98A00),
-    insulin = Indigo,
-    exercise = Color(0xFF168A5C),
+    inRange = Green,
+    low = Color(0xFFD93025),
+    urgentLow = Color(0xFFA50E0E),
+    high = Color(0xFFC98A00),
+    forecast = Color(0xFF55606E),
+    cloudForecast = Color(0xFF2B6CB0),
+    targetBand = Color(0x1A2F7D32),
+    futureShade = Color(0x0A16181A),
+    meal = Color(0xFFD9822B),
+    insulin = Color(0xFF2B6CB0),
+    exercise = Color(0xFF00897B),
 )
 
 val DarkBioColors = BioColors(
-    inRange = IndigoSoft,
-    low = Color(0xFFFF6B6B),
-    urgentLow = Color(0xFFFF4D4D),
-    high = Color(0xFFFFB938),
-    forecast = CyanSoft,
-    targetBand = Color(0x298E9BFF),
-    futureShade = Color(0x0FFFFFFF),
-    meal = Color(0xFFFFB938),
-    insulin = IndigoSoft,
-    exercise = Color(0xFF4CD39A),
+    inRange = GreenSoft,
+    low = Color(0xFFFF6B5E),
+    urgentLow = Color(0xFFFF3B30),
+    high = Color(0xFFFFC233),
+    forecast = Color(0xFFA3ACB8),
+    cloudForecast = Color(0xFF7FB2E5),
+    targetBand = Color(0x247BC67E),
+    futureShade = Color(0x0DFFFFFF),
+    meal = Color(0xFFFFA552),
+    insulin = Color(0xFF7FB2E5),
+    exercise = Color(0xFF4DB6AC),
 )
 
 val LocalBioColors = staticCompositionLocalOf { LightBioColors }

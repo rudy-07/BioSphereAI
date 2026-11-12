@@ -4,20 +4,25 @@ import com.madhusudhan.biosphereai.algo.SafetyBarrier
 import com.madhusudhan.biosphereai.algo.SafetyState
 import kotlin.math.roundToInt
 
-data class Reading(val minute: Int, val value: Double)
+/** One 5-minute sensor reading; [heartRate] comes from the simulated wearable, bpm. */
+data class Reading(val minute: Int, val value: Double, val heartRate: Double = 0.0)
 
 /**
  * A running simulation: one virtual patient, the care events logged so far and the
  * 5-minute sensor readings. Minute 0 corresponds to [startMinuteOfDay] on the clock.
  */
 class SimulationSession(
-    val cohort: Cohort,
+    val persona: Persona,
     val startMinuteOfDay: Int,
     seed: Long,
     var autoMeals: Boolean = true,
     var safetyFilter: Boolean = true,
 ) {
-    private val patient = VirtualPatient(PatientProfile.of(cohort), seed)
+    constructor(cohort: Cohort, startMinuteOfDay: Int, seed: Long, autoMeals: Boolean = true, safetyFilter: Boolean = true) :
+        this(Personas.reference(cohort), startMinuteOfDay, seed, autoMeals, safetyFilter)
+
+    val cohort: Cohort get() = persona.cohort
+    private val patient = VirtualPatient(persona.profile, seed)
     private val _events = mutableListOf<CareEvent>()
     private val _readings = ArrayList<Reading>()
 
@@ -34,8 +39,8 @@ class SimulationSession(
 
     fun advance(minutes: Int) = repeat(minutes) { stepOnce() }
 
-    fun logMeal(carbs: Double, label: String): MealEvent =
-        MealEvent(now, carbs, label).also { _events.add(it) }
+    fun logMeal(carbs: Double, label: String, macros: Macros? = null): MealEvent =
+        MealEvent(now, carbs, label, macros).also { _events.add(it) }
 
     /** Logs a bolus; with the safety filter on, only the permitted share is delivered. */
     fun logInsulin(units: Double): InsulinEvent {
@@ -44,15 +49,15 @@ class SimulationSession(
         return InsulinEvent(now, units, delivered).also { _events.add(it) }
     }
 
-    fun logExercise(durationMin: Double, intensity: Double): ExerciseEvent =
-        ExerciseEvent(now, durationMin, intensity).also { _events.add(it) }
+    fun logExercise(durationMin: Double, intensity: Double, activity: String = "Activity"): ExerciseEvent =
+        ExerciseEvent(now, durationMin, intensity, activity).also { _events.add(it) }
 
     private fun stepOnce() {
         if (autoMeals) runDailyRoutine()
         val active = _events.filter { it.minute >= patient.minute - EVENT_MEMORY_MIN }
         val value = patient.step(active)
         if (patient.minute % READING_STEP_MIN == 0) {
-            _readings.add(Reading(patient.minute, value))
+            _readings.add(Reading(patient.minute, value, (patient.heartRate * 10).roundToInt() / 10.0))
             if (_readings.size > MAX_READINGS) _readings.subList(0, _readings.size - MAX_READINGS).clear()
             updateSafety()
         }
@@ -63,16 +68,16 @@ class SimulationSession(
         patient.basalFraction = if (safetyActive) safety?.deliveryFraction ?: 1.0 else 1.0
     }
 
-    /** Default daily routine (same meals, boluses and walk as run_demo.py). */
+    /** Runs the persona's daily routine (boluses only for type 1). */
     private fun runDailyRoutine() {
-        when (minuteOfDay(patient.minute)) {
-            7 * 60 + 55 -> if (cohort == Cohort.T1D) logInsulin(5.0)
-            8 * 60 -> logMeal(55.0, "Breakfast")
-            12 * 60 + 55 -> if (cohort == Cohort.T1D) logInsulin(7.0)
-            13 * 60 -> logMeal(75.0, "Lunch")
-            17 * 60 -> logExercise(30.0, 1.0)
-            19 * 60 + 25 -> if (cohort == Cohort.T1D) logInsulin(6.0)
-            19 * 60 + 30 -> logMeal(65.0, "Dinner")
+        val clock = minuteOfDay(patient.minute)
+        for (item in persona.routine) {
+            if (item.at != clock) continue
+            when (item) {
+                is RoutineItem.Meal -> logMeal(item.carbs, item.label)
+                is RoutineItem.Bolus -> if (cohort == Cohort.T1D) logInsulin(item.units)
+                is RoutineItem.Activity -> logExercise(item.minutes, item.intensity, item.name)
+            }
         }
     }
 
@@ -88,8 +93,16 @@ class SimulationSession(
             seed: Long,
             autoMeals: Boolean,
             safetyFilter: Boolean,
+        ): SimulationSession = startingNow(Personas.reference(cohort), nowMinuteOfDay, seed, autoMeals, safetyFilter)
+
+        fun startingNow(
+            persona: Persona,
+            nowMinuteOfDay: Int,
+            seed: Long,
+            autoMeals: Boolean,
+            safetyFilter: Boolean,
         ): SimulationSession {
-            val session = SimulationSession(cohort, nowMinuteOfDay, seed, autoMeals = true, safetyFilter = safetyFilter)
+            val session = SimulationSession(persona, nowMinuteOfDay, seed, autoMeals = true, safetyFilter = safetyFilter)
             session.advance(24 * 60)
             session.autoMeals = autoMeals
             return session

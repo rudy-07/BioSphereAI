@@ -53,9 +53,9 @@ private fun TimeInRangesCard(state: UiState) {
     val c = LocalBioColors.current
     val bands = listOf(
         RangeBand("Very high", ">250", m.veryHighPct, c.high),
-        RangeBand("High", "181–250", m.highOnlyPct, c.high.copy(alpha = 0.55f)),
-        RangeBand("In range", "70–180", m.timeInRangePct, c.inRange),
-        RangeBand("Low", "54–69", m.lowOnlyPct, c.low.copy(alpha = 0.7f)),
+        RangeBand("High", "181 to 250", m.highOnlyPct, c.high.copy(alpha = 0.55f)),
+        RangeBand("In range", "70 to 180", m.timeInRangePct, c.inRange),
+        RangeBand("Low", "54 to 69", m.lowOnlyPct, c.low.copy(alpha = 0.7f)),
         RangeBand("Very low", "<54", m.veryLowPct, c.urgentLow),
     )
     val gap = MaterialTheme.colorScheme.surface

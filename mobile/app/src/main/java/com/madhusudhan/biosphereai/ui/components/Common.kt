@@ -27,6 +27,7 @@ import com.madhusudhan.biosphereai.sim.CareEvent
 import com.madhusudhan.biosphereai.sim.ExerciseEvent
 import com.madhusudhan.biosphereai.sim.InsulinEvent
 import com.madhusudhan.biosphereai.sim.MealEvent
+import com.madhusudhan.biosphereai.ui.AlertKind
 import com.madhusudhan.biosphereai.ui.GlucoseStatus
 import com.madhusudhan.biosphereai.ui.theme.BioColors
 import com.madhusudhan.biosphereai.ui.theme.LocalBioColors
@@ -37,6 +38,7 @@ fun SectionCard(
     modifier: Modifier = Modifier,
     title: String? = null,
     containerColor: Color = MaterialTheme.colorScheme.surface,
+    trailing: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
@@ -45,8 +47,11 @@ fun SectionCard(
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
         Column(Modifier.padding(16.dp)) {
-            if (title != null) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
+            if (title != null || trailing != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (title != null) Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    trailing?.invoke()
+                }
                 Spacer(Modifier.size(12.dp))
             }
             content()
@@ -165,4 +170,45 @@ fun ChartLegend(modifier: Modifier = Modifier) {
         LegendItem(MarkerShape.DIAMOND, c.insulin, "Insulin")
         LegendItem(MarkerShape.TRIANGLE, c.exercise, "Activity")
     }
+}
+
+@Composable
+fun alertColor(kind: AlertKind): Color {
+    val c = LocalBioColors.current
+    return when (kind) {
+        AlertKind.URGENT_LOW -> c.urgentLow
+        AlertKind.LOW, AlertKind.LOW_SOON -> c.low
+        AlertKind.HIGH, AlertKind.HIGH_SOON -> c.high
+        AlertKind.NONE -> c.inRange
+    }
+}
+
+/** Small rounded label, e.g. "On device" or "STAGE 1". */
+@Composable
+fun Tag(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant, modifier: Modifier = Modifier) {
+    androidx.compose.material3.Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(50),
+        color = color.copy(alpha = 0.12f),
+    ) {
+        Text(
+            text,
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        )
+    }
+}
+
+/** Vertical colour bar used to mark a status next to text. */
+@Composable
+fun StatusBar(color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier.size(width = 5.dp, height = 36.dp)) {
+        drawRoundRect(color, cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.width / 2, size.width / 2))
+    }
+}
+
+@Composable
+fun MutedText(text: String, modifier: Modifier = Modifier) {
+    Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = modifier)
 }
